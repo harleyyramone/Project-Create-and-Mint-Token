@@ -24,7 +24,11 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MyToken is ERC20, Ownable {
-    constructor() ERC20("MyToken", "MTK") Ownable(msg.sender) {}
+    // Event to log transfers
+    event TokensTransferred(address indexed from, address indexed to, uint256 value);
+
+    // Constructor that sets the token name, symbol, and the owner
+    constructor() ERC20("MyToken", "MTK") Ownable() {}
 
     // Mint function that can only be called by the owner
     function mint(address to, uint256 amount) public onlyOwner {
@@ -35,7 +39,17 @@ contract MyToken is ERC20, Ownable {
     function burn(uint256 amount) public {
         _burn(msg.sender, amount);
     }
+
+    // Override the transfer function to add custom logic
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        bool success = super.transfer(to, amount); // Call the original transfer function
+        if (success) {
+            emit TokensTransferred(msg.sender, to, amount); // Log the transfer event
+        }
+        return success;
+    }
 }
+
 
 ```
 
